@@ -3,7 +3,11 @@
 一个跨平台的备忘录系统。核心是一个部署在 **Cloudflare** 上的网页应用（增删改查、自动保存、搜索），
 另外提供两种"桌面/手机一眼可见"的小组件方案：
 
-- **Windows 端**：用 [Lively Wallpaper](https://www.rocksdanister.com/lively/) 把备忘录嵌进桌面壁纸
+- **Windows 端**：
+
+用 Rainmeter ，近似"实时"刷新（默认 5 秒一次），因为桌面端没有流量/电量限制。
+
+用 [Lively Wallpaper](https://www.rocksdanister.com/lively/) 把备忘录嵌进桌面壁纸，浏览器内核原生渲染，兼容性更好。
 - **Android 端**：原生桌面小组件（Kotlin）
 
 三端共用同一个后端，数据存在 Cloudflare D1 数据库里，全球边缘节点访问，免费额度足够个人使用。
@@ -14,7 +18,7 @@
 
 1. [整体架构](#一整体架构)
 2. [第一步：部署 Cloudflare Worker（所有功能的基础）](#二第一步部署-cloudflare-worker所有功能的基础)
-3. [Windows 桌面小组件（Lively Wallpaper）](#三windows-桌面小组件lively-wallpaper)
+3. [Windows 桌面小组件（Lively Wallpaper）（Rainmeter）](#三windows-桌面小组件lively-wallpaper)
 4. [壁纸 URL 参数大全](#四壁纸-url-参数大全)
 5. [Android 桌面小组件](#五android-桌面小组件)
 6. [常见问题 FAQ](#六常见问题-faq)
@@ -103,7 +107,30 @@
 
 ---
 
-## 三、Windows 桌面小组件（Lively Wallpaper）
+## 三、Windows（Rainmeter 小组件）
+
+近似"实时"刷新（默认 5 秒一次），因为桌面端没有流量/电量限制。
+
+### 安装
+1. 没装过 Rainmeter 的话先装：https://www.rainmeter.net/ （免费开源）
+2. 打开 `windows-rainmeter/MemoWidget` 文件夹，把整个 `MemoWidget` 文件夹复制到：
+   `文档\Rainmeter\Skins\` 目录下
+3. 用文本编辑器打开 `MemoWidget.ini`，把 `[Variables]` 里的
+   ```
+   ApiUrl=https://memo-app.YOUR-SUBDOMAIN.workers.dev/api/widget
+   ```
+   换成你自己部署的 Worker 地址（把 `YOUR-SUBDOMAIN` 换成你真实的子域名）。
+4. 右键系统托盘 Rainmeter 图标 → **Manage** → 左侧找到 **MemoWidget** → 右键 **Load**
+5. 小组件会出现在桌面左上角，可以直接拖动到任意位置；右键可调整透明度、置顶等。
+
+### 自定义
+- `RefreshRate`：刷新间隔（毫秒），默认 5000（5秒）。改成 60000 就是 1 分钟刷新一次。
+- `WidgetWidth` / `WidgetHeight`：调整小组件大小。
+- 点击标题栏或右上角"点击刷新"文字可以手动立即刷新。
+
+---
+
+## 四、Windows 桌面小组件（Lively Wallpaper）
 
 原理：Lively Wallpaper 是一款免费开源软件，能把任意网页设成桌面动态壁纸。
 我们把后端的 `/widget` 页面设成壁纸，备忘录就"贴"在了桌面上，每 5 秒自动刷新。
@@ -142,7 +169,7 @@ https://memo-app.你的子域名.workers.dev/widget?bg=000000&blur=0&card=000000
 
 ---
 
-## 四、壁纸 URL 参数大全
+## 五、Lively Wallpaper 壁纸 URL 参数大全
 
 在 `/widget` 后面加 `?参数1=值1&参数2=值2` 即可。参数之间用 `&` 连接，顺序随意。
 
@@ -188,7 +215,7 @@ https://memo-app.你的子域名.workers.dev/widget?bg=000000&blur=0&card=000000
 
 ---
 
-## 五、Android 桌面小组件
+## 六、Android 桌面小组件
 
 考虑到 Android 对后台任务的限制，采用「**每小时自动刷新一次 + 手动刷新按钮**」的方案，
 不会快速消耗 Worker 的免费请求额度。
@@ -338,7 +365,7 @@ App 装好后，**长按手机桌面空白处** → 选「小组件 / Widgets」
 
 ---
 
-## 六、常见问题 FAQ
+## 七、常见问题 FAQ
 
 **Q：部署 Worker 时报错 `fetch failed` 怎么办？**
 A：多半是临时网络波动，重新跑一次 `wrangler deploy` 即可。
@@ -358,6 +385,9 @@ A：Windows 端默认 5 秒（可用 `rate` 参数调）；Android 端默认每�
 A：Cloudflare Worker 免费额度是每天 10 万次请求。Windows 端 5 秒一次约每天 1.7 万次，
 单人使用完全够。想更省可以把 `rate` 调大（如 `rate=30`）。
 
+**Q：Rainmeter组件刷新不出来？**
+A: 可能要重启电脑。
+
 ---
 
 ## 项目文件结构
@@ -367,6 +397,7 @@ memo-app/
 ├─ worker.js          后端 + 网页 + /widget 壁纸页面（单文件）
 ├─ wrangler.toml      Cloudflare 部署配置（数据库绑定）
 ├─ README.md          本文档
+├─ MemoWidget         Rainmeter皮肤
 └─ android/           Android 小组件源码（拷进 Android Studio 项目用）
    └─ app/
       ├─ build.gradle.snippet.kts   依赖参考片段
