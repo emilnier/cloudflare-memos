@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  这是要合并进你项目 app/src/main/AndroidManifest.xml 的内容片段。
+  如果你是新建项目，直接把 <manifest> 整体内容拷过去即可；
+  如果项目已存在，把 <uses-permission> 和 <application> 里的
+  <receiver> / <service> 节点对应合并进去就行。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.memowidget">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.DeviceDefault">
+
+        <receiver
+            android:name=".MemoWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.memowidget.ACTION_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/memo_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".MemoWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+    </application>
+</manifest>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">备忘录小组件</string>
+    <string name="widget_description">实时显示你的备忘录标题清单</string>
+</resources>

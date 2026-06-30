@@ -1,0 +1,8 @@
+name = "memo-app"
+main = "worker.js"
+compatibility_date = "2026-06-24"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "memo-db"
+database_id = "e87bd911-0cc8-4da7-88a5-473db000ac10"
